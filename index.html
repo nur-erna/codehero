@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeHero STEM - Berpikir Komputasional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b1120, #1a2639);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 30px 25px;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f0f4ff;
+            transition: all 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 700;
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #00d4ff, #7b2ffc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #b0c4ff;
+        }
+
+        p {
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+
+        ul {
+            list-style: none;
+            padding: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        button {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 60px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.4);
+            width: fit-content;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 28px rgba(0, 114, 255, 0.6);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #header span {
+            font-size: 0.95rem;
+        }
+
+        #level-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 10px 0 5px;
+        }
+
+        #level-description {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 16px 20px;
+            border-radius: 20px;
+            margin: 10px 0 15px;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        #stem-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        #stem-badge.science { background: #4CAF50; color: white; }
+        #stem-badge.technology { background: #2196F3; color: white; }
+        #stem-badge.engineering { background: #FF9800; color: white; }
+        #stem-badge.mathematics { background: #9C27B0; color: white; }
+        #stem-badge.integrated { 
+            background: linear-gradient(135deg, #4CAF50, #2196F3, #FF9800, #9C27B0); 
+            color: white;
+        }
+
+        #challenge-area {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 24px;
+            padding: 20px 15px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background: #2a3a5a;
+            border: 2px solid #3f5a7a;
+            padding: 14px 12px;
+            border-radius: 16px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            line-height: 1.4;
+            min-height: 60px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #3a507a;
+            border-color: #6a9aff;
+            transform: scale(1.02);
+        }
+
+        .option-btn.correct {
+            background: #1f8b4c;
+            border-color: #4cdb8a;
+            animation: pulseGreen 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: #a1313a;
+            border-color: #ff6b7a;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulseGreen {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .feedback {
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 500;
+            min-height: 50px;
+            width: 100%;
+        }
+
+        .feedback.success {
+            background: rgba(26, 110, 58, 0.8);
+            color: #b3ffd0;
+            border: 1px solid #4cdb8a;
+        }
+
+        .feedback.error {
+            background: rgba(122, 46, 54, 0.8);
+            color: #ffc0c0;
+            border: 1px solid #ff6b7a;
+        }
+
+        .feedback.info {
+            background: rgba(30, 80, 160, 0.8);
+            color: #b0d4ff;
+            border: 1px solid #4a9eff;
+        }
+
+        #next-btn {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a1a2e;
+            box-shadow: 0 8px 20px rgba(247, 151, 30, 0.5);
+            display: none;
+            margin-top: 15px;
+        }
+
+        #next-btn:hover {
+            box-shadow: 0 12px 28px rgba(247, 151, 30, 0.7);
+        }
+
+        #win-screen h1 {
+            font-size: 3.5rem;
+        }
+
+        #win-screen p {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        #stem-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stem-card {
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .stem-card.science { background: rgba(76, 175, 80, 0.3); border: 1px solid #4CAF50; }
+        .stem-card.technology { background: rgba(33, 150, 243, 0.3); border: 1px solid #2196F3; }
+        .stem-card.engineering { background: rgba(255, 152, 0, 0.3); border: 1px solid #FF9800; }
+        .stem-card.mathematics { background: rgba(156, 39, 176, 0.3); border: 1px solid #9C27B0; }
+
+        .stem-card .label { font-size: 0.8rem; opacity: 0.8; }
+        .stem-card .value { font-size: 1.5rem; }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a1a2e;
+            box-shadow: 0 8px 20px rgba(247, 151, 30, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn-reset:hover {
+            box-shadow: 0 12px 28px rgba(247, 151, 30, 0.6);
+        }
+
+        @media (max-width: 550px) {
+            .option-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2rem; }
+            #level-title { font-size: 1.5rem; }
+            #stem-dashboard {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .stem-card { padding: 8px; font-size: 0.85rem; }
+            .stem-card .value { font-size: 1.2rem; }
+            #header span { font-size: 0.8rem; }
+        }
+
+        @media (max-width: 400px) {
+            #stem-dashboard {
+                grid-template-columns: 1fr;
+            }
+            .screen { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== LAYAR PEMBUKA ========== -->
+    <div id="start-screen" class="screen active">
+        <h1>🚀 CodeHero</h1>
+        <h2>⚡ STEM + Berpikir Komputasional</h2>
+        <p style="text-align:center; margin-bottom:10px;">
+            Perbaiki mesin waktu dengan 4 kekuatan utama:
+        </p>
+        <ul>
+            <li>🧩 <b>Dekomposisi</b> – Pecah masalah jadi bagian kecil</li>
+            <li>🔍 <b>Pengenalan Pola</b> – Temukan keteraturan</li>
+            <li>🎯 <b>Abstraksi</b> – Ambil informasi penting</li>
+            <li>📋 <b>Algoritma</b> – Susun langkah logis</li>
+        </ul>
+        <p style="text-align:center; font-size:0.9rem; opacity:0.7; margin-top:5px;">
+            🧪 Terintegrasi dengan Science, Technology, Engineering & Mathematics
+        </p>
+        <button onclick="startGame()" style="margin-top:20px;">🚀 Mulai Petualangan</button>
+    </div>
+
+    <!-- ========== LAYAR GAME ========== -->
+    <div id="game-screen" class="screen">
+        <div id="header">
+            <span>📍 Level <span id="level-num">1</span>/<span id="total-levels">12</span></span>
+            <span>⭐ Poin: <span id="score">0</span></span>
+        </div>
+
+        <div id="level-title"></div>
+
+        <div id="level-description">
+            <div id="desc-text"></div>
+            <div id="stem-badge" class="integrated">🧪 STEM Terintegrasi</div>
+        </div>
+
+        <div id="challenge-area">
+            <div class="option-grid" id="option-grid"></div>
+        </div>
+
+        <div id="feedback" class="feedback info">💡 Pilih salah satu jawaban di atas</div>
+        <button id="next-btn" onclick="nextLevel()">➜ Level Berikutnya</button>
+    </div>
+
+    <!-- ========== LAYAR KEMENANGAN ========== -->
+    <div id="win-screen" class="screen">
+        <h1>🎉 Selamat!</h1>
+        <p style="font-size:1.3rem;">Kamu berhasil memperbaiki mesin waktu!</p>
+        
+        <div id="stem-dashboard">
+            <div class="stem-card science">
+                <div class="label">🔬 Science</div>
+                <div class="value" id="final-science">0</div>
+            </div>
+            <div class="stem-card technology">
+                <div class="label">💻 Technology</div>
+                <div class="value" id="final-tech">0</div>
+            </div>
+            <div class="stem-card engineering">
+                <div class="label">🏗️ Engineering</div>
+                <div class="value" id="final-eng">0</div>
+            </div>
+            <div class="stem-card mathematics">
+                <div class="label">📐 Mathematics</div>
+                <div class="value" id="final-math">0</div>
+            </div>
+        </div>
+
+        <p style="font-size:1.5rem; font-weight:bold; margin-top:5px;">
+            ⭐ Skor Total: <span id="final-score">0</span>
+        </p>
+        <button class="btn-reset" onclick="resetGame()">🔄 Main Lagi</button>
+    </div>
+
+    <script>
+        // ============================================================
+        //  DATA LEVEL – Menggabungkan CT + STEM
+        // ============================================================
+        const levels = [
+            // ---- LEVEL 1: DEKOMPOSISI (Science) ----
+            {
+                id: 1,
+                title: "🧩 Dekomposisi",
+                desc: "Mana yang merupakan contoh dekomposisi (memecah masalah besar)?",
+                options: [
+                    "Membagi proyek sekolah menjadi riset, menulis, dan presentasi",
+                    "Langsung menulis laporan tanpa perencanaan",
+                    "Menebak jawaban tanpa menghitung"
+                ],
+                correct: 0,
+                explanation: "✅ Benar! Dekomposisi = memecah masalah kompleks menjadi bagian kecil yang mudah dikelola.",
+                stem: "Science",
+                stemIcon: "🔬"
+            },
+            // ---- LEVEL 2: POLA (Mathematics) ----
+            {
+                id: 2,
+                title: "🔍 Pengenalan Pola",
+                desc: "Deret: 3, 6, 12, 24, ... Angka berikutnya adalah?",
+                options: ["36", "48", "72", "96"],
+                correct: 1,
+                explanation: "✅ Polanya: ×2 setiap langkah. 24 × 2 = 48. Ini adalah pola eksponensial!",
+                stem: "Mathematics",
+                stemIcon: "📐"
+            },
+            // ---- LEVEL 3: ABSTRAKSI (Engineering) ----
+            {
+                id: 3,
+                title: "🎯 Abstraksi",
+                desc: "Saat merancang denah rumah, mana yang merupakan abstraksi (menghilangkan detail tidak penting)?",
+                options: [
+                    "Menggambar setiap batu bata dengan detail",
+                    "Hanya menampilkan dinding, pintu, dan jendela",
+                    "Menggambar semua perabotan di setiap ruangan"
+                ],
+                correct: 1,
+                explanation: "✅ Abstraksi = menyederhanakan dengan mengambil informasi penting, mengabaikan yang tidak relevan.",
+                stem: "Engineering",
+                stemIcon: "🏗️"
+            },
+            // ---- LEVEL 4: ALGORITMA (Technology) ----
+            {
+                id: 4,
+                title: "📋 Algoritma",
+                desc: "Urutan langkah membuat teh yang benar adalah?",
+                options: [
+                    "Masukkan teh → Tuang air → Rebus air → Aduk",
+                    "Rebus air → Tuang air → Masukkan teh → Aduk",
+                    "Aduk → Masukkan teh → Rebus air → Tuang air"
+                ],
+                correct: 1,
+                explanation: "✅ Algoritma = urutan langkah logis yang terstruktur. Rebus air dulu, baru seduh!",
+                stem: "Technology",
+                stemIcon: "💻"
+            },
+            // ---- LEVEL 5: SCIENCE - Metode Ilmiah ----
+            {
+                id: 5,
+                title: "🔬 Metode Ilmiah",
+                desc: "Urutan metode ilmiah yang benar adalah?",
+                options: [
+                    "Observasi → Hipotesis → Eksperimen → Analisis → Kesimpulan",
+                    "Eksperimen → Observasi → Hipotesis → Kesimpulan → Analisis",
+                    "Kesimpulan → Eksperimen → Observasi → Hipotesis → Analisis"
+                ],
+                correct: 0,
+                explanation: "✅ Metode ilmiah: Observasi → Hipotesis → Eksperimen → Analisis → Kesimpulan.",
+                stem: "Science",
+                stemIcon: "🔬"
+            },
+            // ---- LEVEL 6: SCIENCE + MATHEMATICS - Pola Fibonacci ----
+            {
+                id: 6,
+                title: "🌿 Pola Fibonacci",
+                desc: "Deret Fibonacci: 1, 1, 2, 3, 5, 8, ... Angka berikutnya?",
+                options: ["10", "11", "13", "15"],
+                correct: 2,
+                explanation: "✅ 13! Fibonacci: setiap angka = jumlah dua sebelumnya (5+8=13). Ditemukan di alam!",
+                stem: "Science + Mathematics",
+                stemIcon: "🧪📐"
+            },
+            // ---- LEVEL 7: TECHNOLOGY - Routing Jaringan ----
+            {
+                id: 7,
+                title: "💻 Routing Data",
+                desc: "Data dikirim dari A ke D. Mana rute PALING EFEKTIF?",
+                options: [
+                    "A → B → D (2 hop)",
+                    "A → C → B → D (3 hop)",
+                    "A → B → C → D (3 hop)",
+                    "A → D (langsung)"
+                ],
+                correct: 3,
+                explanation: "✅ Rute langsung A→D adalah paling efisien (1 hop). Ini konsep routing!",
+                stem: "Technology",
+                stemIcon: "💻"
+            },
+            // ---- LEVEL 8: ENGINEERING - Struktur ----
+            {
+                id: 8,
+                title: "🏗️ Struktur Terkuat",
+                desc: "Bentuk geometris mana yang PALING KUAT untuk konstruksi?",
+                options: [
+                    "Segitiga (3 sisi)",
+                    "Persegi (4 sisi)",
+                    "Segi enam (6 sisi)",
+                    "Lingkaran"
+                ],
+                correct: 0,
+                explanation: "✅ Segitiga adalah bentuk paling stabil dalam teknik sipil! Efisien dan kuat.",
+                stem: "Engineering",
+                stemIcon: "🏗️"
+            },
+            // ---- LEVEL 9: ENGINEERING - Algoritma Perakitan ----
+            {
+                id: 9,
+                title: "⚙️ Perakitan Komputer",
+                desc: "Urutan merakit PC yang BENAR adalah?",
+                options: [
+                    "CPU → RAM → Motherboard → Casing → Power Supply",
+                    "Casing → Motherboard → CPU → RAM → Power Supply",
+                    "Power Supply → Casing → RAM → CPU → Motherboard"
+                ],
+                correct: 1,
+                explanation: "✅ Urutan: Casing dulu, lalu Motherboard, CPU, RAM, terakhir Power Supply.",
+                stem: "Engineering",
+                stemIcon: "⚙️"
+            },
+            // ---- LEVEL 10: MATHEMATICS - Rumus Poligon ----
+            {
+                id: 10,
+                title: "📐 Sudut Poligon",
+                desc: "Rumus jumlah sudut dalam segi-n (n sisi) adalah?",
+                options: [
+                    "(n-2) × 180°",
+                    "n × 180°",
+                    "(n-1) × 180°",
+                    "n × 90°"
+                ],
+                correct: 0,
+                explanation: "✅ (n-2) × 180°. Contoh: segitiga (3) = 180°, segi empat (4) = 360°.",
+                stem: "Mathematics",
+                stemIcon: "📐"
+            },
+            // ---- LEVEL 11: MATHEMATICS - Statistik ----
+            {
+                id: 11,
+                title: "📊 Analisis Data",
+                desc: "Data: 8, 12, 8, 15, 8, 20. Modus (nilai paling sering) adalah?",
+                options: ["8", "12", "15", "20"],
+                correct: 0,
+                explanation: "✅ Modus = 8 (muncul 3 kali). Ini adalah pengenalan pola dalam statistika!",
+                stem: "Mathematics",
+                stemIcon: "📊"
+            },
+            // ---- LEVEL 12: INTEGRATED STEM - Semua konsep ----
+            {
+                id: 12,
+                title: "🌟 STEM Terintegrasi",
+                desc: "Membuat robot untuk membersihkan ruangan. Mana yang menunjukkan ALGORITMA?",
+                options: [
+                    "Membuat sensor ultrasonik",
+                    "Menulis program: maju → belok → mundur → ulangi",
+                    "Menghitung luas ruangan"
+                ],
+                correct: 1,
+                explanation: "✅ Algoritma adalah urutan instruksi yang jelas untuk robot! Ini menggabungkan semua STEM.",
+                stem: "Integrated",
+                stemIcon: "🌟"
+            }
+        ];
+
+        // ============================================================
+        //  STATE GAME
+        // ============================================================
+        let currentLevel = 0;
+        let score = 0;
+        let canAnswer = true;
+        let stemPoints = {
+            science: 0,
+            technology: 0,
+            engineering: 0,
+            mathematics: 0
+        };
+
+        // ============================================================
+        //  DOM REFS
+        // ============================================================
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const winScreen = document.getElementById('win-screen');
+        const levelNum = document.getElementById('level-num');
+        const totalLevels = document.getElementById('total-levels');
+        const scoreDisplay = document.getElementById('score');
+        const levelTitle = document.getElementById('level-title');
+        const descText = document.getElementById('desc-text');
+        const stemBadge = document.getElementById('stem-badge');
+        const optionGrid = document.getElementById('option-grid');
+        const feedback = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const finalScore = document.getElementById('final-score');
+
+        // ============================================================
+        //  FUNGSI UTAMA
+        // ============================================================
+        function startGame() {
+            currentLevel = 0;
+            score = 0;
+            stemPoints = { science: 0, technology: 0, engineering: 0, mathematics: 0 };
+            canAnswer = true;
+            totalLevels.textContent = levels.length;
+            showScreen('game-screen');
+            renderLevel();
+        }
+
+        function renderLevel() {
+            const level = levels[currentLevel];
+            levelNum.textContent = currentLevel + 1;
+            scoreDisplay.textContent = score;
+            levelTitle.textContent = level.title;
+            descText.textContent = level.desc;
+
+            // STEM Badge
+            const stemClass = getStemClass(level.stem);
+            stemBadge.className = stemClass;
+            stemBadge.textContent = `${level.stemIcon || '🧪'} ${level.stem || 'STEM Terintegrasi'}`;
+
+            // Reset feedback
+            feedback.className = 'feedback info';
+            feedback.textContent = '💡 Pilih salah satu jawaban di atas';
+            nextBtn.style.display = 'none';
+            canAnswer = true;
+
+            // Buat tombol pilihan
+            optionGrid.innerHTML = '';
+            level.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.dataset.index = idx;
+                btn.addEventListener('click', () => handleAnswer(idx, btn));
+                optionGrid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, btnEl) {
+            if (!canAnswer) return;
+            canAnswer = false;
+
+            const level = levels[currentLevel];
+            const isCorrect = (selected === level.correct);
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            // Nonaktifkan semua tombol
+            allBtns.forEach(b => b.disabled = true);
+
+            // Tandai jawaban
+            allBtns.forEach((b, idx) => {
+                if (idx === level.correct) b.classList.add('correct');
+                if (idx === selected && !isCorrect) b.classList.add('wrong');
+            });
+
+            // Update skor & feedback
+            if (isCorrect) {
+                score += 10;
+                scoreDisplay.textContent = score;
+                // Tambah STEM points
+                addStemPoints(level.stem);
+                feedback.className = 'feedback success';
+                feedback.textContent = '🎉 ' + level.explanation;
+            } else {
+                feedback.className = 'feedback error';
+                feedback.textContent = '❌ Kurang tepat. ' + level.explanation;
+            }
+
+            // Tampilkan tombol lanjut
+            nextBtn.style.display = 'block';
+        }
+
+        function addStemPoints(stemLabel) {
+            const label = stemLabel.toLowerCase();
+            if (label.includes('science')) stemPoints.science += 10;
+            if (label.includes('technology')) stemPoints.technology += 10;
+            if (label.includes('engineering')) stemPoints.engineering += 10;
+            if (label.includes('mathematics') || label.includes('math')) stemPoints.mathematics += 10;
+            // Jika integrated, tambah ke semua
+            if (label.includes('integrated')) {
+                stemPoints.science += 10;
+                stemPoints.technology += 10;
+                stemPoints.engineering += 10;
+                stemPoints.mathematics += 10;
+            }
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            if (currentLevel < levels.length) {
+                renderLevel();
+            } else {
+                showWinScreen();
+            }
+        }
+
+        function showWinScreen() {
+            showScreen('win-screen');
+            finalScore.textContent = score;
+            document.getElementById('final-science').textContent = stemPoints.science;
+            document.getElementById('final-tech').textContent = stemPoints.technology;
+            document.getElementById('final-eng').textContent = stemPoints.engineering;
+            document.getElementById('final-math').textContent = stemPoints.mathematics;
+        }
+
+        function resetGame() {
+            showScreen('start-screen');
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function getStemClass(stemLabel) {
+            if (!stemLabel) return 'integrated';
+            const label = stemLabel.toLowerCase();
+            if (label.includes('science')) return 'science';
+            if (label.includes('technology')) return 'technology';
+            if (label.includes('engineering')) return 'engineering';
+            if (label.includes('mathematics') || label.includes('math')) return 'mathematics';
+            if (label.includes('integrated')) return 'integrated';
+            return 'integrated';
+        }
+
+        // ============================================================
+        //  INISIALISASI
+        // ============================================================
+        // Tampilkan layar awal
+        showScreen('start-screen');
+    </script>
+</body>
+</html>
